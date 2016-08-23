@@ -1,0 +1,90 @@
+<script src="../../source/domcom-min.js"></script>
+<script>
+DC.ready(function(){
+///////////
+var body = document.body;
+var modules_container = DC.temp();
+DC.load.config({
+	src: 'modules/',// set the base dir for modules
+});
+DC.temp({
+	eltype: 'button',
+	state: {
+		text: 'load video player',
+	},
+	events: {
+		click(){
+			var name = 'player';
+			DC.load({
+				name: name,
+				css: true,
+				// force: true,
+				data: {
+					foo: 'bar'
+				},
+				start(){
+					console.log('load module "' + name+'"');
+				},
+				ready(dc,api){
+					console.log('module "' + name + '" loaded and initialized');
+					dc.insertIn(modules_container);
+					setTimeout(api.stop,1500);
+				},
+				exist(dc,api){
+					api.play();
+					setTimeout(api.stop,1500);
+				},
+				err(err){
+					console.log('error happened: ' + err);
+				}
+			});
+		}
+	}
+})
+.insertIn(body);
+DC.temp({
+	eltype: 'button',
+	state: {
+		text: 'load messenger',
+	},
+	events: {
+		click(){
+			var name = 'messenger';
+			DC.load({
+				name: name,
+				css: true,
+				data: {
+					foo: 'barfoobar'
+				},
+				start(){
+					console.log('load module "' + name+'"');
+				},
+				ready(dc,api){
+					console.log('module "' + name + '" loaded and initialized');
+					dc.insertIn(modules_container);
+				},
+				err(err){
+					console.log('error happened: ' + err);
+				}
+			});
+		}
+	}
+})
+.insertIn(body);
+modules_container.insertIn(body);
+///////////
+});
+
+</script>
+<style>
+button{
+	margin: 3px 10px;
+}
+.module{
+    min-height: 300px;
+    max-width: 50%;
+    min-width: 350px;
+    padding: 10px;
+    margin: 10px;
+}
+</style>

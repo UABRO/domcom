@@ -66,7 +66,7 @@ Element.prototype.html = function (v){
   }
 }
 Element.prototype.val = function (v){
-  if(v){this.value=v;}else{
+  if(typeof v != 'undefined'){this.value=v;}else{
     return this.value;
   }
 }
@@ -78,7 +78,7 @@ Element.prototype.crec = function (){
 
 var DC = function(){
   var selfDC=this;
-  this.version='1.8.2';
+  this.version='1.8.3';
   if(!window.Worker){// support only IE10+
     selfDC.ready = function(){
       document.addEventListener("DOMContentLoaded",function(){
@@ -292,6 +292,9 @@ var DC = function(){
     }else if(obj.initLater){
       self.init=obj.initLater;
     }
+    if(obj.data){
+      self.data = obj.data;
+    }
     if(obj.events){// should be last obj method
       self.addEvents(obj.events);
     }
@@ -456,6 +459,89 @@ var DC = function(){
     obj.temp=1;
     return new DomCom(obj);
   }
+  selfDC.module = function(){
+    var fn = function(name,script){
+      if(!name){
+        console.log('loaded module have wrong structure');
+        return;
+      }
+      fn.loaded[name] = script;
+    }
+    fn.loaded = {};
+    fn.run = function(name,obj){
+      var data = obj.data;
+      var api = obj.ready;
+      if(fn.loaded[name]){
+        if(!data)data = {};
+        var module = fn.loaded[name](data);
+        fn.loaded[name] = module;
+        if(api)api(module.dc,module.api);
+      }else{
+        obj.err && obj.err('module "' + name + '" not loaded');
+      }
+    }
+    return fn;
+  }();
+  selfDC.load = function(){
+    var loaded = selfDC.module.loaded;
+    var mn_src;
+    var fn = function(obj){
+      var name = obj.name;
+      var src = mn_src + name;
+      if(loaded[name] && !obj.force){
+        if(obj.exist){
+          var module = loaded[name];
+          obj.exist(module.dc,module.api);
+        }else{
+          obj.err && obj.err('module "' + name + '" already loaded. Use `force` to load it again');
+        }
+        return;
+      }
+      obj.start && obj.start();
+      if(obj.css){
+        selfDC.temp({
+          eltype: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href: mn_src + 'css/' + name +'.css'
+          },
+          events: {
+            load(){
+              load_script();
+            },
+            error(err){
+              obj.err && obj.err('css for module "' + name + '" ' + "can't be loaded");
+            }
+          }
+        })
+        .insertIn(document.head);
+      }else{
+        load_script();
+      }
+      function load_script(){
+        selfDC.temp({
+          eltype: 'script',
+          attrs: {
+            src: src + '.js'
+          },
+          events: {
+            load(){
+              selfDC.module.run(name,obj);
+              this.remove();
+            },
+            error(){
+              obj.err && obj.err('module "' + name + '" ' + "can't be loaded");
+            }
+          }
+        })
+        .insertIn(document.head);
+      }
+    }
+    fn.config = function(obj){
+      if(obj.src)mn_src = obj.src;
+    }
+    return fn;
+  }();
 }
 DC = new DC;
 

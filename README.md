@@ -9,5 +9,5 @@ DC.
 
 Download source here:
 
-1. [full domcom](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom.js)
-2. [domcom minified](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom-min.js) - less than 7 KB! (**even not gzipped!**)
+1. [raw domcom](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom.js)
+2. [domcom minified](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom-min.js) - ~ 7 KB! (**< 3 KB gzipped!**)
