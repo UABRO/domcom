@@ -78,7 +78,7 @@ Element.prototype.crec = function (){
 
 var DC = function(){
   var selfDC=this;
-  this.version='1.8.3';
+  this.version='1.8.4';
   if(!window.Worker){// support only IE10+
     selfDC.ready = function(){
       document.addEventListener("DOMContentLoaded",function(){
@@ -205,9 +205,44 @@ var DC = function(){
   }
   var DCglo=[];
   var Groups={};// consist of arrays of reference to dcs
+  var LangDC={};// references to dcs for multi language purposes
+  selfDC.lang = function(){
+    var current;// current language indicator [en,uk etc.]
+    var Lang = {};// language specific phrases
+    var fn = function(phrase){
+      if(!current){
+        console.log('Error. Language was not set');
+        return 'undefined';
+      }
+      return Lang[current][phrase];
+    }
+    fn.set = function(obj){
+      for(var lang in obj){
+        Lang[lang] = obj[lang];
+      }
+      return fn;
+    }
+    fn.get = function(obj){
+      return current;
+    }
+    fn.turn = function(lang){
+      if(lang != current){
+        current = lang;
+        for(var key in LangDC){
+          var obj = LangDC[key];
+          obj.f?
+          obj.f():
+          obj.html?
+          obj.dc.change({html:selfDC.lang(obj.dc.state.ihtml)}):
+          obj.dc.change({text:selfDC.lang(obj.dc.state.itext)});
+        }
+      }
+    }
+    return fn;
+  }();
   var DCid = 0;
   var a,b,c;// temp reference
-  // DC.all not recommed to be used in production mode
+  // DC.all not recommend to be used in production mode
   // selfDC.all = function(){
   //   return DCglo;
   // }
@@ -248,7 +283,8 @@ var DC = function(){
       obj.getSelf(this);
     }
     var self=this;
-    this.id = ++DCid;
+    var selfid = ++DCid;
+    this.id = selfid;
     this.state={};
     this.data={};
     this.eltype=obj.eltype?obj.eltype:'div';
@@ -261,6 +297,17 @@ var DC = function(){
         if(prop=='class'){
           self.state.class=obj.state[prop];
         }else{
+          if(prop == 'itext' || prop == 'ihtml'){
+            LangDC[selfid] = {
+              dc: self
+            };
+            if(prop == 'ihtml'){
+              LangDC[selfid].html = 1;
+              self.state.html=selfDC.lang(obj.state.ihtml);
+            }else{
+              self.state.text=selfDC.lang(obj.state.itext);
+            }
+          }
           self.state[prop]=obj.state[prop];
         }
       }
@@ -413,9 +460,17 @@ var DC = function(){
   DomCom.prototype.addEvents = function(obj){
     var self = this;
     for(var prop in obj){
-      self.eventsArr.push(prop);
-      self['on'+prop]=obj[prop];
-      self.el.addEventListener(prop,self['on'+prop]);
+      if(prop == 'lang'){
+        LangDC[self.id] = {
+          dc: self,
+          f: obj[prop].bind(self)
+        }
+        self['on'+prop]=obj[prop].bind(self);
+      }else{
+        self.eventsArr.push(prop);
+        self['on'+prop]=obj[prop];
+        self.el.addEventListener(prop,self['on'+prop]);
+      }
     }
   }
   DomCom.prototype.DClist = function (v){

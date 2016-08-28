@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="main.css">
+<script src="../../source/domcom-min.js"></script>
+<script>
+DC.ready(function(){
+'use strict';
+
+DC.lang.set({
+	'en': {
+		'DESCRIPTION' : 'This is <i>an example</i> of how easily you can use <b>DC</b> for multi language websites.',
+		'CLICK' : 'click',
+		'BUTTON' : 'button',
+		'WELCOME' : 'Welcome to DomCom!',
+		'HTML_NOT_WORK' : 'html <b>tags</b> not work here',
+		'PLACEHOLDER' : 'type your name',
+	},
+	'pl': {
+		'DESCRIPTION' : 'Jest <i>to przykład</i> na to, jak łatwo można użyć <b>DC</b> dla wielu stronach internetowych językowych.',
+		'CLICK' : 'kliknij',
+		'BUTTON' : 'przycisk',
+		'WELCOME' : 'Witamy DomCom!',
+		'HTML_NOT_WORK' : 'html <b>znaczniki</ b> nie tu pracować',
+		'PLACEHOLDER' : "wpisz swoje imię i nazwisko",
+	},
+	'sk': {
+		'DESCRIPTION' : 'Toto <i>je príklad</i> toho, ako ľahko možno použiť <b>DC</b> pre multi jazykových internetových stránkach.',
+		'CLICK' : 'cvaknutie',
+		'BUTTON' : 'gombík',
+		'WELCOME' : 'Vitajte na DomCom!',
+		'HTML_NOT_WORK' : 'html <b>tagy</b> nefunguje tu',
+		'PLACEHOLDER' : "zadajte svoje meno",
+	},
+	'uk': {
+		'DESCRIPTION' : 'Це <i>зразок</i> легкого використання <b>DC</b> для багатомовних сайтів.',
+		'CLICK' : 'клік',
+		'BUTTON' : 'кнопка',
+		'WELCOME' : 'DomCom вітає Вас!',
+		'HTML_NOT_WORK' : 'html <b>теги</b> тут не працюють',
+		'PLACEHOLDER' : "введіть своє ім'я",
+	},
+})
+.turn('en');
+
+var app_container = document.body;
+
+DC.temp({
+	eltype: 'h1',
+	state: {
+		itext: 'WELCOME'
+	}
+})
+.insertIn(app_container);
+
+DC.temp({
+	state: {
+		ihtml: 'DESCRIPTION'
+	}
+})
+.insertIn(app_container);
+
+DC.temp({
+	eltype: 'button',
+	state: {
+		itext: 'BUTTON'
+	}
+})
+.insertIn(app_container);
+
+var input = DC.temp({
+	eltype: 'input',
+	events: {
+		// set pseudoevent listener
+		lang(){
+			// this = this dc
+			this.el.placeholder = DC.lang('PLACEHOLDER');
+		}
+	}
+})
+.insertIn(app_container);
+// call 'lang' event manually
+input.onlang();
+
+DC.temp({
+	state: {
+		class: 'text_only',
+		itext: 'HTML_NOT_WORK'
+	}
+})
+.insertIn(app_container);
+
+var info = DC.temp({
+	state: {
+		text: 'choose your language:'
+	}
+})
+.insertIn(app_container);
+
+DC.temp({
+	eltype: 'select',
+	state: {
+		html: '<option value="en" selected>English</option>\
+		<option value="pl">Polski</option>\
+		<option value="sk">Slovak</option>\
+		<option value="uk">Українська</option>'
+	},
+	events: {
+		change(){
+			var lang = this.value;
+			info.change({text: lang});
+			DC.lang.turn(lang);
+		}
+	}
+})
+.insertIn(app_container);
+
+
+});
+</script>
+
+
+
+
+
+
+
+
+
