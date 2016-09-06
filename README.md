@@ -16,6 +16,6 @@ Download source here:
 
 ```html
 
-<script src="https://cdn.rawgit.com/UABRO/domcom/master/source/domcom-min.js"></script>
+<script src="https://rawgit.com/UABRO/domcom/master/source/domcom-min.js"></script>
 
 ```
