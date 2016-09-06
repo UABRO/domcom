@@ -60,6 +60,11 @@ Element.prototype.height = function (){
 Element.prototype.width = function (){
   return this.offsetWidth;
 }
+Element.prototype.text = function (v){
+  if(v){this.textContent=v;}else{
+    return this.textContent;
+  }
+}
 Element.prototype.html = function (v){
   if(v){this.innerHTML=v;}else{
     return this.innerHTML;
@@ -78,7 +83,7 @@ Element.prototype.crec = function (){
 
 var DC = function(){
   var selfDC=this;
-  this.version='1.8.4';
+  this.version='1.8.5';
   if(!window.Worker){// support only IE10+
     selfDC.ready = function(){
       document.addEventListener("DOMContentLoaded",function(){
@@ -206,6 +211,29 @@ var DC = function(){
   var DCglo=[];
   var Groups={};// consist of arrays of reference to dcs
   var LangDC={};// references to dcs for multi language purposes
+  (function(){
+    var Events = {'lang':1};// list of all pseudo-events
+    selfDC.setPseudo = arr => {
+      if(typeof arr == 'string')arr = [arr];
+      arr.forEach(name => {
+        if(Events[name])return;
+        Events[name] = [];
+      });
+    }
+    selfDC.newPseudo = (name, dc) => {
+      if(!Events[name])return;
+      Events[name].push(dc);
+    }
+    selfDC.isPseudo = name => {
+      return Events[name]?true:false;
+    }
+    selfDC.emit = name => {
+      if(!Events[name])return;
+      Events[name].forEach(dc => {
+        dc['on' + name]();
+      });
+    }
+  }());
   selfDC.lang = function(){
     var current;// current language indicator [en,uk etc.]
     var Lang = {};// language specific phrases
@@ -460,15 +488,19 @@ var DC = function(){
   DomCom.prototype.addEvents = function(obj){
     var self = this;
     for(var prop in obj){
-      if(prop == 'lang'){
-        LangDC[self.id] = {
-          dc: self,
-          f: obj[prop].bind(self)
+      if(selfDC.isPseudo(prop)){
+        if(prop == 'lang'){
+          LangDC[self.id] = {
+            dc: self,
+            f: obj[prop].bind(self)
+          }
+        }else{
+          selfDC.newPseudo(prop,self);
         }
         self['on'+prop]=obj[prop].bind(self);
       }else{
         self.eventsArr.push(prop);
-        self['on'+prop]=obj[prop];
+        self['on'+prop]=obj[prop].bind(self.el);
         self.el.addEventListener(prop,self['on'+prop]);
       }
     }

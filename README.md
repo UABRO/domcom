@@ -11,3 +11,11 @@ Download source here:
 
 1. [raw domcom](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom.js)
 2. [domcom minified](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom-min.js) - ~ 8 KB! (**< 3 KB gzipped!**)
+
+# Include latest version from CDN
+
+```html
+
+<script src="https://cdn.rawgit.com/UABRO/domcom/master/source/domcom-min.js"></script>
+
+```
