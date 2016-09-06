@@ -83,7 +83,7 @@ Element.prototype.crec = function (){
 
 var DC = function(){
   var selfDC=this;
-  this.version='1.8.5';
+  this.version='1.8.6';
   if(!window.Worker){// support only IE10+
     selfDC.ready = function(){
       document.addEventListener("DOMContentLoaded",function(){
@@ -237,23 +237,26 @@ var DC = function(){
   selfDC.lang = function(){
     var current;// current language indicator [en,uk etc.]
     var Lang = {};// language specific phrases
-    var fn = function(phrase){
+    var fn = phrase => {
       if(!current){
         console.log('Error. Language was not set');
         return 'undefined';
       }
       return Lang[current][phrase];
     }
-    fn.set = function(obj){
+    fn.set = obj => {
       for(var lang in obj){
         Lang[lang] = obj[lang];
       }
       return fn;
     }
-    fn.get = function(obj){
+    fn.get = obj => {
       return current;
     }
-    fn.turn = function(lang){
+    fn.ready = lang => {
+      return Lang[lang]?true:false;
+    }
+    fn.turn = lang => {
       if(lang != current){
         current = lang;
         for(var key in LangDC){
@@ -552,6 +555,7 @@ var DC = function(){
         console.log('loaded module have wrong structure');
         return;
       }
+      if(!script)return fn.loaded[name];
       fn.loaded[name] = script;
     }
     fn.loaded = {};
@@ -574,11 +578,10 @@ var DC = function(){
     var mn_src;
     var fn = function(obj){
       var name = obj.name;
-      var src = mn_src + name;
       if(loaded[name] && !obj.force){
         if(obj.exist){
           var module = loaded[name];
-          obj.exist(module.dc,module.api);
+          if(typeof obj.exist == 'function')obj.exist(module.dc,module.api);
         }else{
           obj.err && obj.err('module "' + name + '" already loaded. Use `force` to load it again');
         }
@@ -606,22 +609,41 @@ var DC = function(){
         load_script();
       }
       function load_script(){
-        selfDC.temp({
-          eltype: 'script',
-          attrs: {
-            src: src + '.js'
-          },
-          events: {
-            load(){
-              selfDC.module.run(name,obj);
-              this.remove();
-            },
-            error(){
-              obj.err && obj.err('module "' + name + '" ' + "can't be loaded");
+        if(obj.raw){
+          if(obj.rawcss)selfDC.temp({
+            eltype: 'style',
+            state: {
+              text: obj.rawcss
             }
-          }
-        })
-        .insertIn(document.head);
+          })
+          .insertIn(document.head);
+          selfDC.temp({
+            eltype: 'script',
+            state: {
+              text: obj.raw
+            }
+          })
+          .insertIn(document.head);
+          selfDC.module.run(name,obj);
+        }else{
+          var src = mn_src + name;
+          selfDC.temp({
+            eltype: 'script',
+            attrs: {
+              src: src + '.js'
+            },
+            events: {
+              load(){
+                selfDC.module.run(name,obj);
+                this.remove();
+              },
+              error(){
+                obj.err && obj.err('module "' + name + '" ' + "can't be loaded");
+              }
+            }
+          })
+          .insertIn(document.head);
+        }
       }
     }
     fn.config = function(obj){
