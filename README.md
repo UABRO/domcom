@@ -7,10 +7,7 @@ Read the [DC wiki](https://github.com/UABRO/domcom/wiki) for full documentation.
 Also we recommend you to use and analyze our [domcom-quickstart](https://github.com/UABRO/domcom-quickstart) while learning
 DC.
 
-Download source here:
-
-1. [raw domcom](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom.js)
-2. [domcom minified](https://raw.githubusercontent.com/UABRO/domcom/master/source/domcom-min.js) - ~ 9 KB! (**< 3 KB gzipped!**)
+DomCom size - ~ 9 KB! (**~ 3 KB gzipped!**)
 
 # Include latest version from CDN
 
