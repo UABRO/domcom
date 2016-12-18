@@ -9,7 +9,7 @@ DC.
 
 DomCom size - ~ 9 KB! (**~ 3 KB gzipped!**)
 
-# Include latest version from CDN
+# Include latest version from https://uabro.github.io/
 
 ```html
 
